@@ -156,7 +156,6 @@ merge_liss <- function(.path, .all_bck = FALSE) {
     split(map_lgl(., ~ grepl("[0-9]", names(.)) %>% any())) %>%
     set_names(names(.) %>% str_replace_all(c("TRUE" = "mdl", "FALSE" = "bck")))
 
-
   # Extracts the two-letter module key from the variable names,
   # create a new column with the wave number,
   # remove year-sepecific elements from the variables names to allow merging
@@ -179,7 +178,6 @@ merge_liss <- function(.path, .all_bck = FALSE) {
       )) %>%
       rearrange()) %>%
     split(names(.))
-
 
   # Temporarily append all variables names with their respective first & last label and class
   # to ensure only simiar variables are merged
