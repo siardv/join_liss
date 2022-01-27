@@ -186,7 +186,7 @@ join_liss <- function(.path, .all_bck = FALSE) {
   # Return either a data frame including all background data or only the instances occurring in the module data.
   list(mdl, bck) %>%
     {
-      if (isTRUE(all_bck)) {
+      if (isTRUE(.all_bck)) {
         reduce(., full_join_by)
       } else {
         reduce(., left_join, by = reduce(map(., ~ names(.)), intersect))
