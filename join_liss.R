@@ -28,8 +28,8 @@ download_ids <- c(
 get_liss <- function(.wait = NULL) {
   login <- askYesNo("Are you logged in to the LISS data archive?", prompts = c("yes", "no", "login"))
   if (login) {
-    iwalk(download_ids, ~ paste0("https://www.dataarchive.lissdata.nl/hosted_files/download/", .) %$%
-      c(browseURL(.), Sys.sleep(sum(0, .wait))))
+    iwalk(download_ids, ~ paste0("https://www.dataarchive.lissdata.nl/hosted_files/download/", .) %>%
+      browseURL(.) %$% Sys.sleep(sum(0, .wait)))
   } else {
     browseURL("https://www.dataarchive.lissdata.nl/users/login")
   }
