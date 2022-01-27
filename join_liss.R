@@ -144,7 +144,7 @@ str_alnum <- function(.x, .lower = TRUE, .str = FALSE) {
     str_squish()
 }
 
-# load, prep and group modules --------------------------------------------
+# load, prep, group and join modules --------------------------------------
 
 merge_liss <- function(.path, .all_bck = FALSE) {
 
