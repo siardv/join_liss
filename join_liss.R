@@ -82,7 +82,7 @@ form <-
 full_join_by <-
   compose(~ full_join(.x, .y, by = intersect(names(.x), names(.y))))
 
-# Get the na_values and na_range attributes of the data.frame,
+# Get the na_values and na_range attributes of each column,
 # and keep only those that are finite.
 # If the length of the resulting list is greater than 0,
 # return the range of the values, otherwise return NA.
@@ -137,7 +137,7 @@ rearrange <-
   compose(~ select(.x, sort(names(.x))) %>% select(matches(c("_encr", "wave")), everything()))
 
 # The function takes a string as input and returns a string as output.
-# First it removes all non-alphanumeric characters from the input string,
+# First, it removes all non-alphanumeric characters from the input string,
 # then converts all alphanumeric characters to lowercase,
 # then removes all consecutive whitespace from the string, and
 # then returns the modified string.
@@ -162,7 +162,7 @@ merge_liss <- function(.path, .all_bck = FALSE) {
 
   # Extracts the two-letter module key from the variable names,
   # create a new column with the wave number,
-  # remove year-sepecific elements from the variables names to allow merging
+  # remove wave-specific elements from the variables names to allow join operation
   mdl <-
     extract(liss, "mdl") %>%
     flatten() %>%
@@ -184,7 +184,7 @@ merge_liss <- function(.path, .all_bck = FALSE) {
     split(names(.))
 
   # Temporarily append all variables names with their respective first & last label and class
-  # to ensure only simiar variables are merged
+  # to ensure only similar variables are merged
   mdl %<>%
     map_depth(3, ~ paste(
       list(attr(., "labels"), user_na_values(.)) %>%
@@ -215,7 +215,7 @@ merge_liss <- function(.path, .all_bck = FALSE) {
     flatten() %>%
     reduce(full_join_by)
 
-  # Return either a data frame including all background or only the instanses occuring in the module data.
+  # Return either a data frame including all background data or only the instances occurring in the module data.
   list(mdl, bck) %>%
     {
       if (isTRUE(all_bck)) {
