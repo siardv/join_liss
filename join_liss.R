@@ -1,3 +1,7 @@
+# install.packages("tidyverse")
+# install.packages("magrittr")
+# install.packages("haven")
+# install.packages("stringdist")
 
 library(tidyverse)
 library(magrittr)
