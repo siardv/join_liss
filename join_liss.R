@@ -118,7 +118,7 @@ str_alnum <- function(.x, .lower = TRUE, .str = FALSE) {
 
 # load, prep, group and join modules --------------------------------------
 
-merge_liss <- function(.path, .all_bck = FALSE) {
+join_liss <- function(.path, .all_bck = FALSE) {
 
   # Read all the .sav files in the current directory and all subdirectories,
   # and split them into two lists, one for models and one for backgrounds.
