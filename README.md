@@ -27,5 +27,10 @@ df <- join_liss(.path = "/Users/siardv/Documents/liss", .all_bck = FALSE)
 
 To do, add function to:
 - download files silently in the background;
+- extract of a subset of waves and variables;
 - determine the optimal sequence of waves considering attrition and dropouts;
-- resolve violations of the temporal homogeneity assumption in either all or a defined subset of items (i.e., inconsistencies in time-invariant variables).
+- resolve violations of the temporal homogeneity assumption in either all or a defined subset of items (i.e., inconsistencies in time-invariant variables);
+- create a wide data file;
+- resolve typos and misspellings;
+- impute missing data.
+
