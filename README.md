@@ -23,3 +23,9 @@ get_liss(.wait = 1)
 # .all_bck: join all background data (TRUE) or the intersection across all modules (FALSE, by default).
 df <- join_liss(.path = "/Users/siardv/Documents/liss", .all_bck = FALSE)
 ```
+
+
+To do, add function to:
+- download files silently in the background;
+- determine the optimal sequence of waves considering attrition and dropouts;
+- resolve violations of the temporal homogeneity assumption in either all or a defined subset of items (i.e., inconsistencies in time-invariant variables).
