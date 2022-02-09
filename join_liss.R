@@ -78,7 +78,8 @@ user_na_values <-
         mutate(c = stringdist(a, b) %>% `<=`(0.5)) %>%
         mutate(a = as.numeric(a)) %>%
         .[-c(nrow(.)), ],
-      data.frame(a = .[[1]], d = between(.[[1]], .[[2]][1], .[[2]][2]))
+      data.frame(a = .[[1]], d = between(.[[1]], .[[2]][1], .[[2]][2])) %>%
+        mutate(across(, ~ as.numeric(.)))
     ) %>%
     reduce(full_join_by) %>%
     mutate(e = c + d >= 0.5) %>%
@@ -118,19 +119,15 @@ str_alnum <- function(.x, .lower = TRUE, .str = FALSE) {
 
 # load, prep, group and join modules --------------------------------------
 
-join_liss <- function(.path, .all_bck = FALSE) {
+merge_liss <- function(.path, .all_bck = FALSE) {
+  cat("\rProgress:  0%")
 
-  # Read all the .sav files in the current directory and all subdirectories,
-  # and split them into two lists, one for models and one for backgrounds.
   liss <-
     list.files(.path, pattern = ".sav$", full.names = TRUE, recursive = TRUE) %>%
     map(~ read_sav(., user_na = TRUE)) %>%
     split(map_lgl(., ~ grepl("[0-9]", names(.)) %>% any())) %>%
     set_names(names(.) %>% str_replace_all(c("TRUE" = "mdl", "FALSE" = "bck")))
 
-  # Extracts the two-letter module key from the variable names,
-  # create a new column with the wave number,
-  # remove wave-specific elements from the variables names to allow join operation
   mdl <-
     extract(liss, "mdl") %>%
     flatten() %>%
@@ -151,10 +148,9 @@ join_liss <- function(.path, .all_bck = FALSE) {
       rearrange()) %>%
     split(names(.))
 
-  # Temporarily append all variables names with their respective first & last label and class
-  # to ensure only similar variables are merged
-  mdl %<>%
-    map_depth(3, ~ paste(
+
+  merge_mdl <- function(m) {
+    map_depth(m, 3, ~ paste(
       list(attr(., "labels"), user_na_values(.)) %>%
         {
           .[[1]][-which(.[[1]] %in% .[[2]])]
@@ -162,34 +158,39 @@ join_liss <- function(.path, .all_bck = FALSE) {
         first_last_label(),
       class(.) %>% discard(grepl("_", .)) %>% paste0(collapse = " ")
     )) %>%
-    map_depth(2, ~ unlist(.) %>%
-      {
-        paste(names(.), unname(.)) %>%
-          str_alnum() %>%
-          str_replace_all(" ", ".")
-      }) %>%
-    list(mdl) %$%
-    map2(.[[1]], .[[2]], ~ map2(.x, .y, ~ set_names(.y, .x))) %>%
-    map(~ reduce(., full_join_by)) %>%
-    map(~ set_names(., names(.) %>%
-      str_replace("^(.*?)\\..*?$", "\\1") %>%
-      make.unique(sep = "_"))) %>%
-    map(~ rearrange(.)) %>%
-    reduce(full_join_by)
+      map_depth(2, ~ unlist(.) %>%
+        {
+          paste(names(.), unname(.)) %>%
+            str_alnum() %>%
+            str_replace_all(" ", ".")
+        }) %>%
+      list(m) %$%
+      map2(.[[1]], .[[2]], ~ map2(.x, .y, ~ set_names(.y, .x))) %>%
+      map(~ reduce(., full_join_by)) %>%
+      map(~ set_names(., names(.) %>%
+        str_replace("^(.*?)\\..*?$", "\\1") %>%
+        make.unique(sep = "_"))) %>%
+      map(~ rearrange(.)) %>%
+      reduce(full_join_by)
+  }
 
-  # Taking the data from the liss data frame and extracting the bck column.
+  mls <- c()
+  for (i in seq_along(mdl)) {
+    cat("\rProgress: ", round(i / length(mdl) * 100, 2), "%\t\t", sep = "")
+    mls %<>% c(list(merge_mdl(mdl[i])))
+  }
+
   bck <-
     extract(liss, "bck") %>%
     flatten() %>%
     reduce(full_join_by)
 
-  # Return either a data frame including all background data or only the instances occurring in the module data.
-  list(mdl, bck) %>%
-    {
-      if (isTRUE(.all_bck)) {
-        reduce(., full_join_by)
-      } else {
-        reduce(., left_join, by = reduce(map(., ~ names(.)), intersect))
-      }
-    }
+  bck <-
+    map(mls, ~ select(., nomem_encr, nohouse_encr, wave_date)) %>%
+    reduce(full_join_by) %>%
+    set_names(c(names(.)[1:2], "wave")) %>%
+    left_join(bck, names(.)) %>%
+    rename(wave_date = wave)
+
+  list(mls, bck)
 }
