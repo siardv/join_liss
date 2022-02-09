@@ -194,3 +194,24 @@ merge_liss <- function(.path, .all_bck = FALSE) {
 
   list(mls, bck)
 }
+
+liss_df <-
+  merge_liss("/Users/siard/Downloads/liss_all/sav")
+
+# temporary solution for merging bug
+liss_df[[1]][[9]] %<>%
+  {
+    list(
+      select(., !contains("wave_date")),
+      mutate(., across(contains("wave_date"), as.double)) %>%
+        select(contains("wave_date")) %>%
+        reduce(coalesce) %>%
+        as_tibble_col(column_name = "wave_date")
+    )
+  } %>%
+  reduce(bind_cols) %>%
+  select(nohouse_encr, nomem_encr, wave, wave_date, everything())
+
+liss_merged <-
+  c(liss_df[[1]], liss_df[2]) %>%
+  reduce(full_join)
