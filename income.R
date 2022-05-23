@@ -1,6 +1,6 @@
 
-####### household income: within-household outliers
-# (written before I knew what tidyverse was)
+# LISS household income: identifying and resolving within-household outliers,
+# written before I knew what tidyverse was.
 
 ### load packages
 library(haven)
