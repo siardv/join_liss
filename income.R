@@ -12,7 +12,6 @@ library(imputeTS)
 
 options(scipen = 9)
 
-
 ### helper functions
 # get mode excluding NA, largest value is returned if 50/50
 Mode <- function(x, na.rm = TRUE) {
@@ -379,7 +378,3 @@ tryCatch(
 )
 
 haven::write_sav(income, "~/Documents/RU/CRP/income/output.sav")
-
-liss_df <- join_liss("~/Downloads/liss2")
-income_clean <- income
-income_clean %<>% tibble() %>% select(!c(ncol(.) - 5):ncol(.))
